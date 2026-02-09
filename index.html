@@ -30,15 +30,8 @@
       max-width: 400px;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 25px;
-    }
+    h1 { font-size: 2rem; margin-bottom: 10px; }
+    p  { font-size: 1.1rem; margin-bottom: 20px; }
 
     .buttons {
       position: relative;
@@ -51,14 +44,14 @@
       padding: 12px 22px;
       border: none;
       border-radius: 12px;
-      position: absolute;
       white-space: nowrap;
-      touch-action: none; /* 🔑 clave para móvil */
+      cursor: pointer;
     }
 
     #yes {
       background: #e03838;
       color: white;
+      position: absolute;
       left: 50%;
       transform: translateX(-120%);
     }
@@ -66,8 +59,10 @@
     #no {
       background: #555;
       color: white;
+      position: absolute;
       left: 50%;
       transform: translateX(20%);
+      touch-action: none;
     }
 
     @media (max-width: 480px) {
@@ -80,7 +75,7 @@
 </head>
 <body>
 
-  <div class="card">
+  <div class="card" id="app">
     <h1>💘 ¿Quieres ser mi San Valentín? 💘</h1>
     <p>Prometo risas, besos y momentos inolvidables.</p>
 
@@ -91,70 +86,60 @@
   </div>
 
   <script>
-    const noBtn = document.getElementById('no');
-    const yesBtn = document.getElementById('yes');
-    const container = document.querySelector('.buttons');
+    const app = document.getElementById('app');
+    const initialHTML = app.innerHTML;
 
-    function moveNoButton() {
-      const maxX = container.clientWidth - noBtn.clientWidth;
-      const maxY = container.clientHeight - noBtn.clientHeight;
+    function initEvents() {
+      const noBtn = document.getElementById('no');
+      const yesBtn = document.getElementById('yes');
+      const container = document.querySelector('.buttons');
 
-      noBtn.style.left = Math.random() * maxX + 'px';
-      noBtn.style.top  = Math.random() * maxY + 'px';
+      function moveNoButton() {
+        const maxX = container.clientWidth - noBtn.clientWidth;
+        const maxY = container.clientHeight - noBtn.clientHeight;
+        noBtn.style.left = Math.random() * maxX + 'px';
+        noBtn.style.top  = Math.random() * maxY + 'px';
+      }
+
+      noBtn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        moveNoButton();
+      });
+
+      noBtn.addEventListener('pointermove', moveNoButton);
+
+      yesBtn.addEventListener('click', () => {
+        showResult(`
+          <h1>💖 Sabia que dirías que sí 💖</h1>
+          <p>Eres mi persona favorita todos los días. y por eso quiero compartir contigo el dia de los enamorados</p>
+          <p> Es todavia un secreto que haremos<p>
+          <p>💌 Te amo 💌</p>
+        `);
+      });
+
+      noBtn.addEventListener('click', () => {
+        showResult(`
+          <h1>😏 Sabía que intentarías darle al No</h1>
+          <p>No tenés escapatoria, nos vamos a ver el sábado.</p>
+          <p>💌 Te amo 💌</p>
+        `);
+      });
     }
 
-    // 🔥 Funciona en mouse + touch
-    noBtn.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      moveNoButton();
+    function showResult(content) {
+      history.pushState({ page: 'result' }, '', '#result');
+
+      app.innerHTML = content;
+    }
+
+    // BOTÓN ATRÁS DEL NAVEGADOR
+    window.addEventListener('popstate', () => {
+      app.innerHTML = initialHTML;
+      initEvents();
     });
 
-    noBtn.addEventListener('pointermove', () => {
-      moveNoButton();
-    });
-
-    yesBtn.addEventListener('click', () => {
-      document.body.innerHTML = `
-        <div style="
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          min-height:100vh;
-          background: linear-gradient(135deg, #f3f2f2, #7ea0ff);
-          color:white;
-          text-align:center;
-          font-family:Arial;
-          padding:30px;">
-          <div>
-            <h1>💖 Sabía que dirías que sí 💖</h1>
-            <p>Eres mi persona favorita todos los días.</p>
-            <p>💌 Te amo 💌</p>
-          </div>
-        </div>
-      `;
-    });
-
-     noBtn.addEventListener('click', () => {
-      document.body.innerHTML = `
-        <div style="
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          min-height:100vh;
-          background: linear-gradient(135deg, #f3f2f2, #7ea0ff);
-          color:white;
-          text-align:center;
-          font-family:Arial;
-          padding:30px;">
-          <div>
-            <h1>Sabía que intentarias darle al No</h1>
-            <p>No tenes escapatoria, nos vemos el sabado.</p>
-            <p>💌 Te amo 💌</p>
-          </div>
-        </div>
-      `;
-    });
-
+    // inicial
+    initEvents();
   </script>
 
 </body>
